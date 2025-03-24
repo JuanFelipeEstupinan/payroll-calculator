@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+      <title>Offshore Payroll Calculator</title>
+      <style>
+         .calc-container {
+            font-family: 'Open Sans';
+             margin: 20px;
+             background-color: #f8f9fa; /* Light gray background */
+             max-width: 1000px;
+             margin: auto;
+             background: #deeaf6;
+             padding: 20px;
+             border-radius: 10px;
+             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+         }
+         .calc-container * {
+             font-family: 'Open Sans';
+             outline: none;
+         }
+         .calc-container h2 {
+             color: #294d95;
+             font-size: 35px;
+             font-weight: 700;
+             padding-bottom: 30px;
+             text-align: center;
+         }
+         .calc-container button {
+             display: block;
+             width: 100%;
+             margin: 10px 0;
+             background-color: #317fc7;
+             color: white;
+             border: none;
+             padding: 10px;
+             cursor: pointer;
+             border-radius: 15px;
+             transition: background-color 0.3s ease; /* Added transition */
+         }
+         .calc-container button:hover {
+            background-color: #317fc7;
+         }
+         .table-container {
+            width: 100%;
+            overflow-x: auto;
+         }
+         .calc-container table {
+             width: 100%;
+             min-width: 683px;
+             border-collapse: collapse;
+             margin-top: 20px;
+             background: white;
+             border-radius: 10px;
+             overflow: hidden;
+         }
+         .calc-container th, .calc-container td {
+             padding: 12px;
+             text-align: left;
+             border-bottom: 1px solid #dee2e6; /* light gray table lines */
+         }
+         .calc-container th {
+             background-color: #2a4d95; /* Teal Table header */
+             color: white;
+         }
+         .calc-container tr:nth-child(even) {
+            background-color: #f2f2f2;
+         }
+         .calc-container tfoot {
+             font-weight: bold;
+             background-color: #2a4d95; /* very light teal footer */
+             color: white;
+         }
+         .report-card {
+             display: none;
+             background-color: white; /* White background */
+             padding: 20px;
+             margin-top: 20px;
+             border-radius: 10px; /* Rounded corners */
+             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
+             position: relative; /* Needed for shadow to work properly */
+         }
+         .report-card button {
+             background-color: #0047AB; /* Dark Blue report button */
+             color: white;
+             border: none;
+             padding: 10px;
+             cursor: pointer;
+             border-radius: 5px;
+             margin-top: 10px;
+             transition: background-color 0.3s ease;
+         }
+         .report-card button:hover {
+            background-color: #003380;
+         }
+         .autocomplete {
+             position: relative;
+             display: inline-block;
+             width: 100%;
+         }
+         .autocomplete-items {
+             position: absolute;
+             border: 1px solid #d4d4d4;
+             border-bottom: none;
+             border-top: none;
+             z-index: 99;
+             top: 100%;
+             left: 0;
+             right: 0;
+             max-height: 200px;
+             overflow-y: scroll;
+         }
+         .autocomplete-items div {
+             font-size: 14px;
+             padding: 10px;
+             cursor: pointer;
+             background-color: #fff;
+             border-bottom: 1px solid #d4d4d4;
+             text-transform: capitalize;
+         }
+         .autocomplete-items div:hover {
+            background-color: #e9e9e9;
+         }
+         .input-row-container {
+             display: flex;
+             align-items: center;
+             background-color: #f0f0f0;
+             padding: 10px;
+             border-radius: 5px;
+             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+             position: relative;
+         }
+         .search-role {
+             flex: 1;
+             margin-right: 6px;
+         }
+         .search-role input {
+             font-size: 14px;
+             width: 100%;
+             padding: 8px 0 8px 5px;
+             border: 1px solid #ccc;
+             border-radius: 3px 0 0 3px;
+             text-transform: capitalize;
+         }
+         .experience-dropdown {
+             font-size: 14px;
+             padding: 7px;
+             border: 1px solid #ccc;
+             border-radius: 0 3px 3px 0;
+             margin-right: 10px;
+         }
+         .quantity-control {
+             display: flex;
+             align-items: center;
+             margin-right: 10px;
+         }
+         .calc-container .quantity-button {
+             background-color: #317fc7;
+             border: none;
+             padding: 0px 0px;
+             cursor: pointer;
+             border-radius: 3px;
+             font-size: 20px;
+             width: 33px;
+             height: 33px;
+             text-align: center;
+         }
+         .quantity-input {
+             width: 40px;
+             padding: 8px 5px;
+             text-align: center;
+             border: 1px solid #ccc;
+             border-radius: 3px;
+             margin: 0 5px;
+             background: white;
+             color: black;
+             font-size: 14px;
+         }
+         .calc-container .add-staff-button {
+             background-color: #2a4d95;
+             color: white;
+             border: none;
+             padding: 8px 15px;
+             cursor: pointer;
+             border-radius: 15px;
+             width: 100px;
+             box-sizing: border-box;
+         }
+         .calc-container .generate-report-button {
+             background-color: #2a4d95;
+             border-radius: 15px;
+             width: 260px;
+             font-size: 20px;
+             margin-left: auto;
+             margin-right: auto;
+             font-weight: 700;
+         }
+         .empty-table-div {
+             text-align: center;
+             padding-top: 20px;
+         }
+         .report-card h3{
+            font-weight: 800;
+         }
+         .report-card button {
+             background-color: #2a4d95;
+             border-radius: 15px;
+             width: 260px;
+             font-size: 20px;
+             margin-left: auto;
+             margin-right: auto;
+             font-weight: 700;
+         }
+         .pricing-text, #reportSavings {
+             background-color: rgba(222, 234, 246, 0.40); /* Light yellow background */
+             padding: 5px 10px; /* Add some padding for spacing */
+             border-radius: 3px; /* Slightly rounded corners */
+             color: #ff6209;
+             font-weight: 800;
+         }
+         @media (max-width: 550px) {
+            .input-row-container {
+                flex-direction: column; /* Stack elements vertically */
+                align-items: stretch; /* Stretch items to full width */
+            }
+
+            .search-role {
+                margin-right: 0; /* Remove right margin */
+                margin-bottom: 10px; /* Add bottom margin for spacing */
+            }
+
+            .search-role input {
+                width: 98%;
+            }
+
+            .experience-dropdown,
+            .quantity-control,
+            .add-staff-button {
+                width: 100%; /* Make them full width */
+                margin-right: 0; /* Remove right margin */
+                margin-bottom: 10px; /* Add bottom margin for spacing */
+            }
+
+            .experience-dropdown{
+                border-radius: 3px;
+            }
+        }
+      </style>
+   </head>
+   <body>
+      <div class="calc-container">
+         <h2>Calculate the Cost of Your Payroll With AssistsYourBiz</h2>
+         <div class="input-row-container">
+            <div class="autocomplete search-role">
+               <input type="text" id="role" placeholder="Search a role">
+            </div>
+            <select class="experience-dropdown">
+               <option value="junior">Junior</option>
+               <option value="mid">Mid-level</option>
+               <option value="senior">Senior</option>
+            </select>
+            <div class="quantity-control">
+               <button class="quantity-button" onclick="changeQuantity(-1)">-</button>
+               <input type="number" value="1" class="quantity-input" disabled>
+               <button class="quantity-button" onclick="changeQuantity(1)">+</button>
+            </div>
+            <button class="add-staff-button" onclick="addRole()">Add staff</button>
+         </div>
+         <div class="table-container"> 
+         <table id="resultTable" style="display:none;">
+            <thead>
+               <tr>
+                  <th>Role</th>
+                  <th>Experience</th>
+                  <th>No. of Staff</th>
+                  <th>US Salary</th>
+                  <th>Offshore Salary</th>
+                  <th>Savings %</th>
+                  <th></th>
+               </tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+            <tfoot>
+               <tr>
+                  <td>Total</td>
+                  <td></td>
+                  <td></td>
+                  <td id="totalUsSalary">$0</td>
+                  <td id="totalOffshoreSalary">$0</td>
+                  <td id="totalSavings">0%</td>
+                  <td></td>
+               </tr>
+            </tfoot>
+         </table>
+        </div>
+         <div class="empty-table-div">
+            <h3>
+            Find out how much you could save on your payroll. Add your first staff member!
+            <h3>
+
+            <h4>Can't find the role you're looking for? Our recruitment experts can find it for you. <a onclick="contactUsNewRole()" style="text-decoration: underline; font-weight: 500; cursor: pointer; color:#317fc7">Click here to contact us!</a><h4>
+         </div>
+         <button class="generate-report-button" onclick="generateReport()">GENERATE REPORT</button>
+         <div id="reportCard" class="report-card">
+            <h3>Team Payroll Summary</h3>
+            <p>Average Cost Per Person: <span id="avgCostPerPerson"></span></p>
+            <p>Total Team Cost: <span id="totalTeamCost"></span></p>
+            <p>Average Hourly Cost: <span id="avgHourlyCost"></span></p>
+            <p>Total Savings: <span id="reportSavings"></span></p>
+            <button class="contact-us-button" onclick="contactUs()">CONTACT US!</button>
+         </div>
+      </div>
+      <script>
+         const salaryData = {
+            "administrative assistant": {
+               junior: { us: 35000, offshore: 20800 },
+               mid: { us: 45000, offshore: 27300 },
+               senior: { us: 55000, offshore: 31200 }
+            },
+            "community manager": {
+               junior: { us: 50000, offshore: 20800 },
+               mid: { us: 65000, offshore: 27300 },
+               senior: { us: 80000, offshore: 31200 }
+            },
+            "customer service Rep": {
+               junior: { us: 30000, offshore: 20800 },
+               mid: { us: 40000, offshore: 27300 },
+               senior: { us: 50000, offshore: 31200 }
+            },
+            "data analyst": {
+               junior: { us: 60000, offshore: 23400 },
+               mid: { us: 75000, offshore: 28600 },
+               senior: { us: 90000, offshore: 39000 }
+            },
+            "legal assistant": {
+               junior: { us: 45000, offshore: 24700 },
+               mid: { us: 55000, offshore: 32500 },
+               senior: { us: 65000, offshore: 36400 }
+            },
+            "logistics coordinator": {
+               junior: { us: 40000, offshore: 23400 },
+               mid: { us: 50000, offshore: 28600 },
+               senior: { us: 60000, offshore: 39000 }
+            },
+            "project manager": {
+               junior: { us: 70000, offshore: 26000 },
+               mid: { us: 90000, offshore: 32000 },
+               senior: { us: 110000, offshore: 39000 }
+            },
+            "sales development rep": {
+               junior: { us: 45000, offshore: 20800 },
+               mid: { us: 60000, offshore: 27300 },
+               senior: { us: 75000, offshore: 31200 }
+            }
+         };
+         let totalUsSalary = 0;
+         let totalOffshoreSalary = 0;
+         let totalStaff = 0;
+         let staffList = [];
+         const roles = Object.keys(salaryData);
+         
+         function autocomplete(inp, arr) {
+         let currentFocus;
+         
+         inp.addEventListener("click", function(e) {
+         let a, b, i;
+         closeAllLists();
+         a = document.createElement("DIV");
+         a.setAttribute("id", this.id + "autocomplete-list");
+         a.setAttribute("class", "autocomplete-items");
+         this.parentNode.appendChild(a);
+         for (i = 0; i < arr.length; i++) {
+             b = document.createElement("DIV");
+             b.innerHTML = arr[i];
+             b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+             b.addEventListener("click", function(e) {
+                 inp.value = this.getElementsByTagName("input")[0].value;
+                 closeAllLists();
+             });
+             a.appendChild(b);
+         }
+         });
+         
+         inp.addEventListener("input", function(e) {
+         let a, b, i, val = this.value;
+         closeAllLists();
+         if (!val) { return false; }
+         currentFocus = -1;
+         a = document.createElement("DIV");
+         a.setAttribute("id", this.id + "autocomplete-list");
+         a.setAttribute("class", "autocomplete-items");
+         this.parentNode.appendChild(a);
+         for (i = 0; i < arr.length; i++) {
+             const role = arr[i].toLowerCase();
+             const searchVal = val.toLowerCase();
+             const matchIndex = role.indexOf(searchVal);
+         
+             if (matchIndex !== -1) {
+                 b = document.createElement("DIV");
+                 b.innerHTML = arr[i].substring(0, matchIndex) +
+                     "<strong>" + arr[i].substring(matchIndex, matchIndex + val.length) + "</strong>" +
+                     arr[i].substring(matchIndex + val.length);
+                 b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                 b.addEventListener("click", function(e) {
+                     inp.value = this.getElementsByTagName("input")[0].value;
+                     closeAllLists();
+                 });
+                 a.appendChild(b);
+             }
+         }
+         });
+         
+         inp.addEventListener("keydown", function(e) {
+         let x = document.getElementById(this.id + "autocomplete-list");
+         if (x) x = x.getElementsByTagName("div");
+         if (e.keyCode === 40) {
+             currentFocus++;
+             addActive(x);
+         } else if (e.keyCode === 38) {
+             currentFocus--;
+             addActive(x);
+         } else if (e.keyCode === 13) {
+             e.preventDefault();
+             if (currentFocus > -1) {
+                 if (x) x[currentFocus].click();
+             }
+         }
+         });
+         
+         function addActive(x) {
+         if (!x) return false;
+         removeActive(x);
+         if (currentFocus >= x.length) currentFocus = 0;
+         if (currentFocus < 0) currentFocus = (x.length - 1);
+         x[currentFocus].classList.add("autocomplete-active");
+         }
+         
+         function removeActive(x) {
+         for (let i = 0; i < x.length; i++) {
+             x[i].classList.remove("autocomplete-active");
+         }
+         }
+         
+         function closeAllLists(elmnt) {
+         let x = document.getElementsByClassName("autocomplete-items");
+         for (let i = 0; i < x.length; i++) {
+             if (elmnt !== x[i] && elmnt !== inp) {
+                 x[i].parentNode.removeChild(x[i]);
+             }
+         }
+         }
+         
+         document.addEventListener("click", function (e) {
+         closeAllLists(e.target);
+         });
+         }
+         
+         autocomplete(document.getElementById("role"), roles);
+         
+         function changeQuantity(change) {
+         let quantityInput = document.querySelector('.quantity-input');
+         let currentQuantity = parseInt(quantityInput.value);
+         
+         if (change === '+' || change === 1) {
+             quantityInput.value = currentQuantity + 1;
+         } else if (change === '-' || change === -1) {
+             if (currentQuantity > 1) { // Prevent quantity from going below 1
+                 quantityInput.value = currentQuantity - 1;
+             }
+         }
+         }
+         
+         function addRole() {
+         let role = document.getElementById('role').value.toLowerCase();
+         let experience = document.querySelector('.experience-dropdown').value;
+         let staffCount = parseInt(document.querySelector('.quantity-input').value);
+         
+         if (!salaryData[role]) {
+         return;
+         }
+         
+         let usSalary = salaryData[role][experience].us * staffCount;
+         let offshoreSalary = salaryData[role][experience].offshore * staffCount;
+         let savings = ((usSalary - offshoreSalary) / usSalary) * 100;
+         
+         let table = document.getElementById('resultTable');
+         let tbody = document.getElementById('resultBody');
+         let row = document.createElement('tr');
+         
+         row.innerHTML = `
+         <td><strong>${role.replace(/\b\w/g, c => c.toUpperCase())}</strong></td>
+         <td><strong>${experience.replace(/\b\w/g, c => c.toUpperCase())}</strong></td>
+         <td>${staffCount}</td>
+         <td>$${(usSalary / staffCount).toLocaleString()} x ${staffCount} = $${usSalary.toLocaleString()}</td>
+         <td>$${(offshoreSalary / staffCount).toLocaleString()} x ${staffCount} = <span class="pricing-text">$${offshoreSalary.toLocaleString()}<span></td>
+         <td><strong>${savings.toFixed(2)}%</strong></td>
+         <td><button onclick="deleteRole(this)">Remove</button></td> `;
+         tbody.appendChild(row);
+         
+         totalUsSalary += usSalary;
+         totalOffshoreSalary += offshoreSalary;
+         totalStaff += staffCount;
+         staffList.push({ role, experience, staffCount, usSalary, offshoreSalary, savings });
+         
+         let totalSavings = ((totalUsSalary - totalOffshoreSalary) / totalUsSalary) * 100;
+         
+         document.getElementById('totalUsSalary').textContent = `$${totalUsSalary.toLocaleString()}`;
+         document.getElementById('totalOffshoreSalary').textContent = `$${totalOffshoreSalary.toLocaleString()}`;
+         document.getElementById('totalSavings').textContent = `${totalSavings.toFixed(2)}%`;
+         
+         table.style.display = 'table';
+         
+         // Show the "Generate Report" button if there are rows in the table
+         if (tbody.children.length > 0) {
+         document.querySelector('button[onclick="generateReport()"]').style.display = 'block';
+         document.querySelector('div[class="empty-table-div"]').style.display = 'none';
+         }
+         updateReport();
+         }
+         
+         function deleteRole(button) {
+         let row = button.parentNode.parentNode;
+         let tbody = row.parentNode;
+         
+         // Parse salaries directly from the data, without relying on displayed text
+         let rowIndex = Array.from(tbody.children).indexOf(row);
+         let usSalary = staffList[rowIndex].usSalary;
+         let offshoreSalary = staffList[rowIndex].offshoreSalary;
+         let staffCount = staffList[rowIndex].staffCount;
+         
+         totalUsSalary -= usSalary;
+         totalOffshoreSalary -= offshoreSalary;
+         totalStaff -= staffCount;
+         
+         // Remove the staff from the staffList array.
+         staffList.splice(rowIndex, 1);
+         
+         document.getElementById('totalUsSalary').textContent = `$${totalUsSalary.toLocaleString()}`;
+         document.getElementById('totalOffshoreSalary').textContent = `$${totalOffshoreSalary.toLocaleString()}`;
+         
+         tbody.removeChild(row);
+         
+         if (tbody.children.length === 0) {
+         document.getElementById('resultTable').style.display = 'none';
+         document.querySelector('button[onclick="generateReport()"]').style.display = 'none';
+         }
+         
+         let totalSavings = 0;
+         if (totalUsSalary > 0) {
+         totalSavings = ((totalUsSalary - totalOffshoreSalary) / totalUsSalary) * 100;
+         }
+         document.getElementById('totalSavings').textContent = `${totalSavings.toFixed(2)}%`;
+         
+         if (tbody.children.length == 0) {
+         document.querySelector('button[onclick="generateReport()"]').style.display = 'none';
+         document.querySelector('div[class="empty-table-div"]').style.display = 'block';
+         document.getElementById('reportCard').style.display = 'none';
+         }
+         updateReport();
+         }
+         
+         function updateReport() {
+         let avgCostPerPerson = totalOffshoreSalary / totalStaff;
+         let totalTeamCost = totalOffshoreSalary;
+         let avgHourlyCost = (totalOffshoreSalary / (totalStaff * 2080)); // Assuming 2080 work hours per year
+         let reportSavings = (totalUsSalary - totalOffshoreSalary);
+         
+         document.getElementById('avgCostPerPerson').textContent = `$${Math.round(avgCostPerPerson).toLocaleString()}`;
+         document.getElementById('totalTeamCost').textContent = `$${totalTeamCost.toLocaleString()}`;
+         document.getElementById('avgHourlyCost').textContent = `$${avgHourlyCost.toFixed(2)}`;
+         document.getElementById('reportSavings').textContent = `$${reportSavings.toLocaleString()}`;
+         }
+         
+         function generateReport() {
+         updateReport()
+         document.getElementById('reportCard').style.display = 'block';
+         }
+         
+         // Initially hide the "Generate Report" button and show the empty table div
+         document.querySelector('button[onclick="generateReport()"]').style.display = 'none';
+         document.querySelector('div[class="empty-table-div"]').style.display = 'block';
+         
+         function contactUs() {
+             let email = 'info@assistsyourbiz.com';
+             let subject = 'Interested in this offshore team';
+             let body = 'Hi,\n\nI have configured a team on your website and would like to learn more about the next steps. Below are the staff details I selected:\n\n';
+             
+             staffList.forEach(staff => {
+             body += `Role: ${staff.role}, Experience: ${staff.experience}, Staff Count: ${staff.staffCount}\n`;
+             });
+
+             body += `\nPlease let me know how we can proceed. Looking forward to your response.\n`;
+             
+             let mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+             window.location.href = mailtoLink;
+         }
+
+         function contactUsNewRole() {
+             let email = 'info@assistsyourbiz.com';
+             let subject = 'Interested in a specific role';
+             let body = 'Hi,\n\nI used your payroll calculator, but I couldn’t find a specific role I need. Could you provide payroll details for the following position?:\n\nRole: [PLEASE FILL OUT]\n\nDesired skills/Experience: [PLEASE FILL OUT]\n\nLooking forward to your response!\n';
+             
+             let mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+             window.location.href = mailtoLink;
+         }
+         
+      </script>
+   </body>
+</html>
