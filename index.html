@@ -203,6 +203,9 @@
              text-align: center;
              padding-top: 20px;
          }
+         .report-card {
+            overflow-x: auto;
+         }
          .report-card h3{
             font-weight: 800;
          }
@@ -221,6 +224,29 @@
              border-radius: 3px; /* Slightly rounded corners */
              color: #ff6209;
              font-weight: 800;
+             position: relative;
+             left: -10px;
+         }
+         .report-card table {
+            width: 100%;
+            margin:0 auto;
+            max-width: max-content;
+         }
+         .report-card th {
+            background-color: white;
+            color: #878787;
+            border: none;
+         }
+         .report-card td {
+            background-color: white;
+            border: none;
+         }
+         .report-card .report-card-description {
+            background-color: white;
+            color: #878787
+         }
+         .report-card .offshore {
+            font-weight: 800;
          }
          @media (max-width: 550px) {
             .input-row-container {
@@ -306,13 +332,42 @@
          </div>
          <button class="generate-report-button" onclick="generateReport()">GENERATE REPORT</button>
          <div id="reportCard" class="report-card">
-            <h3>Team Payroll Summary</h3>
-            <p>Average Cost Per Person: <span id="avgCostPerPerson"></span></p>
-            <p>Total Team Cost: <span id="totalTeamCost"></span></p>
-            <p>Average Hourly Cost: <span id="avgHourlyCost"></span></p>
-            <p>Total Savings: <span id="reportSavings"></span></p>
-            <button class="contact-us-button" onclick="contactUs()">CONTACT US!</button>
-         </div>
+    <h3>Team Payroll Summary</h3>
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>US Team</th>
+                <th>Offshore Team</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="report-card-description">Average Cost Per Person:</td>
+                <td id="avgCostPerPersonUS"></td>
+                <td class="offshore" id="avgCostPerPersonOffshore"></td>
+            </tr>
+            <tr>
+                <td class="report-card-description">Total Team Cost:</td>
+                <td id="totalTeamCostUS"></td>
+                <td class="offshore" id="totalTeamCostOffshore"></td>
+            </tr>
+            <tr>
+                <td class="report-card-description">Average Hourly Cost:</td>
+                <td id="avgHourlyCostUS"></td>
+                <td class="offshore" id="avgHourlyCostOffshore"></td>
+            </tr>
+            <tr>
+                <td style="font-weight: 800;">Total Savings:</td>
+                <td></td>
+                <td>
+                    <span id="reportSavings"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="contact-us-button" onclick="contactUs()">CONTACT US!</button>
+</div>
       </div>
       <script>
          const salaryData = {
@@ -564,17 +619,29 @@
          }
          
          function updateReport() {
-         let avgCostPerPerson = totalOffshoreSalary / totalStaff;
-         let totalTeamCost = totalOffshoreSalary;
-         let avgHourlyCost = (totalOffshoreSalary / (totalStaff * 2080)); // Assuming 2080 work hours per year
-         let reportSavings = (totalUsSalary - totalOffshoreSalary);
-         
-         document.getElementById('avgCostPerPerson').textContent = `$${Math.round(avgCostPerPerson).toLocaleString()}`;
-         document.getElementById('totalTeamCost').textContent = `$${totalTeamCost.toLocaleString()}`;
-         document.getElementById('avgHourlyCost').textContent = `$${avgHourlyCost.toFixed(2)}`;
-         document.getElementById('reportSavings').textContent = `$${reportSavings.toLocaleString()}`;
-         }
-         
+    let avgCostPerPersonOffshore = totalOffshoreSalary / totalStaff;
+    let totalTeamCostOffshore = totalOffshoreSalary;
+    let avgHourlyCostOffshore = (totalOffshoreSalary / (totalStaff * 2080)); // Assuming 2080 work hours per year
+
+    let avgCostPerPersonUS = totalUsSalary / totalStaff;
+    let totalTeamCostUS = totalUsSalary;
+    let avgHourlyCostUS = (totalUsSalary / (totalStaff * 2080));
+
+    let reportSavings = totalUsSalary - totalOffshoreSalary;
+
+    // Set the values for Offshore
+    document.getElementById('avgCostPerPersonOffshore').textContent = `$${Math.round(avgCostPerPersonOffshore).toLocaleString()}`;
+    document.getElementById('totalTeamCostOffshore').textContent = `$${totalTeamCostOffshore.toLocaleString()}`;
+    document.getElementById('avgHourlyCostOffshore').textContent = `$${avgHourlyCostOffshore.toFixed(2)}`;
+
+    // Set the values for US
+    document.getElementById('avgCostPerPersonUS').textContent = `$${Math.round(avgCostPerPersonUS).toLocaleString()}`;
+    document.getElementById('totalTeamCostUS').textContent = `$${totalTeamCostUS.toLocaleString()}`;
+    document.getElementById('avgHourlyCostUS').textContent = `$${avgHourlyCostUS.toFixed(2)}`;
+
+    // Set the total savings
+    document.getElementById('reportSavings').textContent = `$${reportSavings.toLocaleString()}`;
+}         
          function generateReport() {
          updateReport()
          document.getElementById('reportCard').style.display = 'block';
